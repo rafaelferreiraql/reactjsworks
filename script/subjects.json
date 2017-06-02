@@ -1,0 +1,128 @@
+[
+    {
+        "name": "Defence Against The Dark Arts",
+        "credits": 4,
+        "elective": false,
+        "sched": {
+            "wed": "8-12"
+        }
+    },
+    {
+        "name": "Potions",
+        "credits": 4,
+        "elective": false,
+        "sched": {
+            "mon": "13-15",
+            "thu": "13-15"
+        }
+    },
+    {
+        "name": "Charms",
+        "credits": 4,
+        "elective": false,
+        "sched": {
+            "mon": "8-12"
+        }
+    },
+    {
+        "name": "Herbology",
+        "credits": 2,
+        "elective": false,
+        "sched": {
+            "fri": "13-15"
+        }
+    },
+    {
+        "name": "Flying",
+        "credits": 4,
+        "elective": false,
+        "sched": {
+            "wed": "13-16"
+        }
+    },
+    {
+        "name": "History of Magic",
+        "credits": 2,
+        "elective": false,
+        "sched": {
+            "tue": "13-15"
+        }
+    },
+    {
+        "name": "Transfiguration",
+        "credits": 2,
+        "elective": false,
+        "sched": {
+            "fri": "10-12"
+        }
+    },
+    {
+        "name": "Astronomy",
+        "credits": 2,
+        "elective": false,
+        "sched": {
+            "wed": "13-15"
+        }
+    },
+    {
+        "name": "Arithmancy",
+        "credits": 4,
+        "elective": true,
+        "sched": {
+            "mon": "8-10",
+            "wed": "8-10"
+        }
+    },
+    {
+        "name": "Divination",
+        "credits": 4,
+        "elective": true,
+        "sched": {
+            "tue": "10-12",
+            "thu": "10-12"
+        }
+    },
+    {
+        "name": "Muggle Studies",
+        "credits": 2,
+        "elective": true,
+        "sched": {
+            "thu": "11-13"
+        }
+    },
+    {
+        "name": "Apparition",
+        "credits": 4,
+        "elective": true,
+        "sched": {
+            "mon": "18-20",
+            "wed": "18-20"
+        }
+    },
+    {
+        "name": "Care of Magical Creatures",
+        "credits": 2,
+        "elective": true,
+        "sched": {
+            "fri": "8-10"
+        }
+    },
+    {
+        "name": "Study of Ancient Runes",
+        "credits": 4,
+        "elective": true,
+        "sched": {
+            "mon": "10-12",
+            "fri": "10-12"
+        }
+    },
+    {
+        "name": "Magical Theory",
+        "credits": 4,
+        "elective": true,
+        "sched": {
+            "mon": "15-17",
+            "fri": "15-17"
+        }
+    }
+]

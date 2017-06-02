@@ -1,0 +1,43 @@
+{
+  "name": "reactjs-works",
+  "version": "1.0.0",
+  "description": "Showcase of basic ReactJS capability",
+  "main": "index.js",
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "jstransformer-escape-html": "^1.0.0",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "webpack": "^2.5.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.0.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.1",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "html-loader": "^0.4.5",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.3",
+    "postcss": "^6.0.1",
+    "postcss-loader": "^2.0.5",
+    "pug-html-loader": "^1.1.4",
+    "style-loader": "^0.17.0",
+    "webpack": "^2.5.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafaelferreiraql/reactjsworks.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rafaelferreiraql/reactjsworks/issues"
+  },
+  "homepage": "https://github.com/rafaelferreiraql/reactjsworks#readme"
+}

@@ -1,0 +1,294 @@
+<!DOCTYPE html><html><head><title>React Works!</title><link rel="stylesheet" href="styles.css"></head><body><div id="common"><header><h1>React Works!</h1><p class="desc">A brief showcase of Facebook's React technology and exposition of methods used in it.</p></header><nav><a href="./index.html">Home</a><a href="./react.html">What is React?</a><a href="./reaction.html">React in (re)Action</a><a href="./process.html">The Process (Part I)</a><a href="./process2.html">The Process (Part II)</a></nav><footer class="largeview"><p>2017 Rafael Ferreira</p></footer></div><main><h1>The Process</h1><p>Now that you seen it, let's understand it!</p><h2>Review</h2><p>Before we start, let's review what exactly is the app; if you haven't seen it yet, follow <a href="reaction.html">here</a>. Now that you've experienced the app, let's summarize.</p><p>This application, which we'll call it the "Hogwarts app", has two parts: a info part that shows the user how many credits do the chosen subjects take and the weekly schedule, and the subject list where the user can interact with and add or remove subjects.</p><h2>Reacting to the task</h2><p>Before all, let's actually add React to the app. There are <i>two</i> libraries you need: React and ReactDOM. You would normally insert both in &lt;script src='...'&gt; tags in the &lt;head&gt; section, and indeed you could. I'm wrapping all my JS code in Webpack, so instead of adding both React and ReactDOM in tags, my code starts with something like this:</p><pre><code>let React = require("react");
+let ReactDOM = require("react-dom");</code></pre><p>So, how exactly would React take care of this?</p><p>As said <a href="react.html">before</a>, React you write your DOM structure and React renders it to the DOM. There are basically three parts: the schedule, the credits and the subject list. You can neatly divide those three parts in your code. Let's see the very basic structure:</p><pre><code>class App extends React.Component {
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;Stats /&gt;
+        &lt;Subjects /&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+class Stats extends React.Component {
+  render() {
+    ...
+  }
+}
+
+class Subjects extends React.Component {
+  render() {
+    ...
+  }
+}
+
+ReactDOM.render(&lt;App /&gt;, document.getElementById(&quot;reaction&quot;))
+</code></pre><p>You might have many questions, and the first is probably "why can you just write markup-style tags in Javascript"? And why it doesn't even look like valid HTML?</p><p>This is JSX, not Javascript; this markup is characteristic of JSX, which compiles to Javascript (usually through something like <a href="http://babeljs.io/">Babel</a>), to the React.createElement() function. You can directly write this function instead of having to compile JSX, but it's way uglier boilerplate for something that's supposed to correspond to HTML.</p><p>The classes defined here correspond to <i>React Components</i>. These components are chunks of markup you create in your code, in the form of ES6 classes that extend the React.Component class. You describe these chunks in the <code>render()</code> method.</p><h2>Organizing the project</h2><p>In the example above (which is already a crude representation of the Hogwarts app), you render the App component directly in the DOM through react-dom, which, in this case, renders everything inside a div with the "reaction" id. This component also includes a Stats component and a Subjects component, which themselves will be developed in their respective <code>render()</code>s. If you already checked the source code, you may have noticed the Subjects class doesn't actually exist (there's a Subject class though), but it's a choice of mine I will explain later.</p><p>Let's start with the Subjects component.</p><p>Every subject is displayed the same way: it's a rounded square containing the name of the subject, the amount of credits and the period of each lesson. Fortunately, in React, you can do something like this:</p><pre><code>render() {
+  &lt;div&gt;
+    {an_array.map(function(item) {
+      return &lt;p&gt;{item}&lt;/p&gt;
+    })}
+  &lt;/div&gt;
+}</code></pre><p>Every time you use {} inside JSX markup, you're accessing Javascript. So, in this case, for every item in <code>an_array</code>, we return <code>&lt;p&gt;{item}&lt;/p&gt;</code>, which is a paragraph containing the <code>item</code> in that iteration (once again, we have to access it through { }). This way, the resulting markup would be:</p><pre><code>render() {
+  &lt;div&gt;
+    {[&lt;p&gt;item1&lt;/p&gt;,
+    &lt;p&gt;item2&lt;/p&gt;,
+    &lt;p&gt;item3&lt;/p&gt;,
+    ...]}
+  &lt;/div&gt;
+}
+
+...That React eventually turns to:
+
+render() {
+  &lt;div&gt;
+    &lt;p&gt;item1&lt;/p&gt;
+    &lt;p&gt;item2&lt;/p&gt;
+    &lt;p&gt;item3&lt;/p&gt;
+    ...
+  &lt;/div&gt;
+}</code></pre><p>Wonderful! And that's similar to what we need for our curriculum: a list of items that we can print. In this case, it's a bit more complex; we're not dealing with <code>&lt;p&gt;</code> tags anymore, it's a whole div with some paragraphs inside containing different data. That calls for the creation of another component, we'll call it Subject.</p><pre><code>render() {
+  &lt;div className=&quot;subjects&quot;&gt;
+    {subjects.map((subject,i) =&gt; {
+      return (
+        &lt;Subject subjectdata={subject} /&gt;
+      )
+    })}
+  &lt;/div&gt;
+}</code></pre><h2>Props</h2><p>Before we go on, there's something we must look at. Inside <code>&lt;Subject /&gt;</code> we have what seems to be an attribute called <code>subjectdata</code>, assigned to the <code>subject</code> item of the <code>subjects</code> array. That attribute is called a <b>Prop</b> in React language, and it's something React components can use inside their definition. In this case, we're going to use the data inside <code>subject</code> (which would be name, credits and period) to fill the information needed:</p><pre><code>class Subject extends React.Component {
+  render() {
+    return (
+    &lt;div className=&quot;subj&quot;&gt;
+      &lt;p className=&quot;subjName&quot;&gt;{this.props.subjectdata.name}&lt;/p&gt;
+        &lt;p className=&quot;subjCreds&quot;&gt;Credits: {this.props.subjectdata.credits}&lt;/p&gt;
+        &lt;p className=&quot;subjSched&quot;&gt;
+          { Object.keys(this.props.subjectdata.sched).map((day) =&gt; {
+            return (
+              &lt;span&gt;
+                {day} {this.props.subjectdata.sched[day]}
+              &lt;/span&gt;
+            )
+          }) }
+        &lt;/p&gt;
+    &lt;/div&gt;
+    )
+  }
+}</code></pre><p>As you might have guessed, <code>this.props.subjectdata</code> is the <code>subject</code> passed on to the component in the previous code. We effectively use that data to build our Subject components' markup.</p><p>One thing before we continue: When using iterative methods like <code>map()</code>, we must assign a <code>key</code> prop to each element as well, and each value must be unique between all iterations. That's for internal React use, since it could eventually lose track of which element is which if there's no key to follow. So, let's add a key:</p><pre><code>{ Object.keys(this.props.subjectdata.sched).map((day,index) =&gt; {
+  return (
+    &lt;span key={index}&gt;
+      {day} {this.props.subjectdata.sched[day]}
+    &lt;/span&gt;
+  )
+}) }</code></pre><p>It's simple, but works well enough. It's still unique.</p><p>Think about our Hogwarts application again. There are three global fixed datum that won't change once the app is started and we could wish to set or easily change before execution: the curriculum (imagine we want to use that tool for your particular university instead of Hogwarts: you can!), the minimum credits required and maximum credits required.</p><p>You may already know where I'm coming from. It'll be convenient to add these as props!</p><pre><code>let subjectlist = require(&quot;./subjects.json&quot;);
+
+ReactDOM.render(&lt;App subjects={subjectlist} minCreds={16} maxCreds={32} /&gt;, document.getElementById(&quot;reaction&quot;))
+
+// subjects.json
+
+[
+  {
+    &quot;name&quot;: &quot;Defence Against The Dark Arts&quot;,
+    &quot;credits&quot;: 4,
+    &quot;elective&quot;: false,
+    &quot;sched&quot;: {
+      &quot;wed&quot;: &quot;8-12&quot;
+    }
+  },
+  {
+    &quot;name&quot;: &quot;Potions&quot;,
+    &quot;credits&quot;: 4,
+    &quot;elective&quot;: false,
+    &quot;sched&quot;: {
+      &quot;mon&quot;: &quot;13-15&quot;,
+      &quot;thu&quot;: &quot;13-15&quot;
+    }
+  },
+  ...
+]</code></pre><p>Now, every time we want to bring up these values inside the App component, we could just use <code>this.props.yourprop</code>. However, if we want to use these props on inner components, we have to manually pass them, so for example, coming back to our <code>render()</code> for the App component,</p><pre><code>render() {
+  return (
+    &lt;div&gt;
+      &lt;Stats minCreds={this.props.minCreds} maxCreds={this.props.maxCreds}/&gt;
+      &lt;Subjects subjects={this.props.subjects}/&gt;
+    &lt;/div&gt;
+  )
+}</code></pre><p>(That explains why I don't have the Subjects component in the real code; I'd rather not have to keep passing props through components that won't use it. It's a matter of preference, though)</p><p>We should also patch up the Subjects component render, where we can now use the subject list as a prop to generate each <code>&lt;Subject /&gt;</code>. I'll leave that to you.</p><h2>Wrapping up basic markup</h2><p>Finally, here's the Stats component:</p><pre><code>render() {
+  return (
+    &lt;div className=&quot;stats&quot;&gt;
+      &lt;div className=&quot;schedule&quot;&gt;
+        &lt;table&gt;
+          &lt;thead&gt;
+            &lt;tr&gt;
+              &lt;th className=&quot;day&quot;&gt;&lt;/th&gt;
+              &lt;th&gt;8h&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;10h&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;12h&lt;/th&gt;
+              &lt;th&gt;13h&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;15h&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;17h&lt;/th&gt;
+              &lt;th&gt;&lt;/th&gt;
+              &lt;th&gt;19h&lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody&gt;
+            {[&quot;mon&quot;,&quot;tue&quot;,&quot;wed&quot;,&quot;thu&quot;,&quot;fri&quot;].map((day,i) =&gt; {
+              let days = [
+                &quot;Monday&quot;,
+                &quot;Tuesday&quot;,
+                &quot;Wednesday&quot;,
+                &quot;Thursday&quot;,
+                &quot;Friday&quot;
+              ];
+              return (
+                &lt;tr key={i}&gt;
+                  &lt;td className={day}&gt;{days[i]}&lt;/td&gt;
+                  {[8,9,10,11,12,13,14,15,16,17,18,19].map((h,i) =&gt; {
+                    return &lt;td key={h}&gt;&lt;/td&gt;
+                  })}
+                &lt;/tr&gt;
+              );
+            })}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+      &lt;div className=&quot;credits&quot;&gt;
+        &lt;span className=&quot;minimum&quot;&gt;{this.props.minCreds}&lt;/span&gt;
+        &lt;span className=&quot;userCredits&quot;&gt;0&lt;/span&gt;
+        &lt;span className=&quot;maximum&quot;&gt;{this.props.maxCreds}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div className=&quot;label&quot;&gt;
+        &lt;span className=&quot;minimum&quot;&gt;minimum credits&lt;/span&gt;
+        &lt;span className=&quot;userCredits&quot;&gt;credits&lt;/span&gt;
+        &lt;span className=&quot;maximum&quot;&gt;maximum credits&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}</code></pre><p>Just to quickly summarize: <code>&lt;div className='schedule'&gt;</code> contains a table describing the weekly schedule. It currently does nothing, it's as good as a framework right now. Likewise, the credits section (represented by the "credits" and "label" divs) do nothing as well, and they currently display 0 credits. We'll make them work soon enough.</p><p>Also, don't freak out by the "className" attribute. It's exactly equivalent to <code>class='name'</code> in HTML, but it's necessary as <code>class</code> is a reserved keyword in Javascript (and we've been using it for every component definition ;D).</p><p><a href="process2.html">Follow here</a> to continue to the second part, where our app will come alive. Click the button below to show how our code looks like right now (it's hidden just so you won't freak out!)</p><button id="sourcebutton">Open source code</button><pre id="source"><code>let React = require(&quot;react&quot;);
+let ReactDOM = require(&quot;react-dom&quot;);
+let subjectlist = require(&quot;./subjects.json&quot;);
+
+// REMEMBER! I&#39;m using Webpack! If you&#39;re using plain HTML scripts,
+// You oughta use &lt;script src=&quot;...&quot;&gt; to call these!
+
+class App extends React.Component {
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;Stats minCreds={this.props.minCreds} maxCreds={this.props.maxCreds}/&gt;
+        &lt;Subjects subjects={this.props.subjects} /&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+class Stats extends React.Component {
+  render() {
+    return (
+      &lt;div className=&quot;stats&quot;&gt;
+        &lt;div className=&quot;schedule&quot;&gt;
+          &lt;table&gt;
+            &lt;thead&gt;
+              &lt;tr&gt;
+                &lt;th className=&quot;day&quot;&gt;&lt;/th&gt;
+                &lt;th&gt;8h&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;10h&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;12h&lt;/th&gt;
+                &lt;th&gt;13h&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;15h&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;17h&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;19h&lt;/th&gt;
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+              {[&quot;mon&quot;,&quot;tue&quot;,&quot;wed&quot;,&quot;thu&quot;,&quot;fri&quot;].map((day,i) =&gt; {
+                let days = [
+                  &quot;Monday&quot;,
+                  &quot;Tuesday&quot;,
+                  &quot;Wednesday&quot;,
+                  &quot;Thursday&quot;,
+                  &quot;Friday&quot;
+                ];
+                return (
+                  &lt;tr key={i}&gt;
+                    &lt;td className={day}&gt;{days[i]}&lt;/td&gt;
+                    {[8,9,10,11,12,13,14,15,16,17,18,19].map((h,i) =&gt; {
+                      return &lt;td key={h}&gt;&lt;/td&gt;
+                    })}
+                  &lt;/tr&gt;
+                );
+              })}
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;credits&quot;&gt;
+          &lt;span className=&quot;minimum&quot;&gt;{this.props.minCreds}&lt;/span&gt;
+          &lt;span className=&quot;userCredits&quot;&gt;0&lt;/span&gt;
+          &lt;span className=&quot;maximum&quot;&gt;{this.props.maxCreds}&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;label&quot;&gt;
+          &lt;span className=&quot;minimum&quot;&gt;minimum credits&lt;/span&gt;
+          &lt;span className=&quot;userCredits&quot;&gt;credits&lt;/span&gt;
+          &lt;span className=&quot;maximum&quot;&gt;maximum credits&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+class Subjects extends React.Component {
+    render() {
+      &lt;div className=&quot;subjects&quot;&gt;
+        {this.props.subjects.map((subject,i) =&gt; {
+          return (
+            &lt;Subject key={i} subjectdata={subject} /&gt;
+          )
+        })}
+      &lt;/div&gt;
+    }
+}
+
+class Subject extends React.Component {
+  render() {
+    return (
+    &lt;div className=&quot;subj&quot;&gt;
+      &lt;p className=&quot;subjName&quot;&gt;{this.props.subjectdata.name}&lt;/p&gt;
+        &lt;p className=&quot;subjCreds&quot;&gt;Credits: {this.props.subjectdata.credits}&lt;/p&gt;
+        &lt;p className=&quot;subjSched&quot;&gt;
+          { Object.keys(this.props.subjectdata.sched).map((day,index) =&gt; {
+            return (
+              &lt;span key={index}&gt;
+                {day} {this.props.subjectdata.sched[day]}
+              &lt;/span&gt;
+            )
+          }) }
+        &lt;/p&gt;
+    &lt;/div&gt;
+    )
+  }
+}
+
+ReactDOM.render(&lt;App subjects={subjectlist} minCreds={16} maxCreds={32} /&gt;, document.getElementById(&quot;reaction&quot;));
+</code></pre><script>{
+  let source = document.getElementById("source");
+  let sourcebutton = document.getElementById("sourcebutton");
+  source.style.display = "none";
+
+  sourcebutton.onclick = function() {
+    if(source.style.display === "none") {
+      source.style.display = "block";
+      sourcebutton.innerHTML = "WAAAAH! (click again to hide)";
+    }
+    else {
+      source.style.display = "none";
+      sourcebutton.innerHTML = "Open source code";
+    }
+  }
+}</script><footer class="smallview"><p>2017 Rafael Ferreira</p></footer></main></body></html>

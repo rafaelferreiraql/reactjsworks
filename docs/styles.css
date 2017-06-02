@@ -1,0 +1,229 @@
+html {
+  height: 100%;
+  position: relative;
+}
+body {
+  height: 100%;
+  margin: 0;
+  font-family: "proxima-nova", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+  background-color: #444;
+}
+#common {
+  border-radius: 0 0 32px 32px;
+  background-color: #555555;
+  color: #ddd;
+  margin: 0;
+  width: 100%;
+}
+#common header h1 {
+  margin-top: 0;
+  padding: 16px 0 0 0;
+  color: #0cf;
+}
+#common nav {
+  font-variant: small-caps;
+  margin-top: 3em;
+  padding-bottom: 32px;
+}
+#common nav a {
+  border-left: 4px solid #ddd;
+  padding: 4px;
+  margin: 2px;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+#common nav a:hover {
+  background-color: #0088bb;
+}
+#common > header,
+#common nav a,
+#common footer {
+  padding-left: 16px;
+}
+#common .desc {
+  font-size: 0.8em;
+}
+main {
+  padding: 16px;
+  color: #ddd;
+}
+main a {
+  text-decoration: none;
+  color: #999;
+}
+footer {
+  font-size: .8em;
+}
+footer.largeview {
+  display: none;
+  position: absolute;
+  bottom: 0;
+}
+footer.smallview {
+  display: block;
+}
+footer.smallview p {
+  margin-bottom: 0;
+}
+@media (min-width: 650px), (min-aspect-ratio: 1.5) and (-webkit-min-device-pixel-ratio: 1.25), (min-aspect-ratio: 1.5) and (min-resolution: 120dpi) {
+  html {
+    height: 100%;
+  }
+  footer.largeview {
+    display: block;
+  }
+  footer.smallview {
+    display: none;
+  }
+  body {
+    min-height: 100%;
+  }
+  body #common {
+    position: fixed;
+    left: 0;
+    border-radius: 0 32px 32px 0;
+    height: 100%;
+    width: 250px;
+  }
+  body main {
+    margin-left: 250px;
+    width: auto;
+    overflow: hidden;
+  }
+}
+.subjects {
+  width: 100%;
+}
+.subjects .subj {
+  width: 15em;
+  display: inline-block;
+  margin: 8px 8px 8px 0;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: #ddd;
+  border: 1px solid #ddd;
+  color: #444;
+  -webkit-transition: 0.1s linear;
+  transition: 0.1s linear;
+  font-size: .8em;
+}
+.subjects .subj .subjName {
+  margin: 2px 0;
+  font-weight: bold;
+}
+.subjects .subj .subjCreds {
+  font-size: .9em;
+}
+.subjects .subj .subjSched {
+  margin: 8px 0 2px 0;
+  font-size: .8em;
+}
+.subjects .subj .subjSched * {
+  margin-right: 1em;
+}
+.subjects .subj.active {
+  background-color: #333333;
+  border: 1px solid #ddd;
+  color: #ddd;
+}
+.stats {
+  display: block;
+  overflow: hidden;
+}
+.stats .selected {
+  float: right;
+}
+.stats table {
+  width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+}
+.stats table th {
+  text-align: left;
+}
+.stats table th + th {
+  font-size: .7em;
+  font-weight: normal;
+}
+.stats table th + th:not(:empty) {
+  border-left: 1px solid;
+}
+.stats table th.day {
+  width: 6em;
+}
+.stats table td {
+  -webkit-transition: 0.2s background-color;
+  transition: 0.2s background-color;
+  padding: 8px 0;
+}
+.stats table td .mon,
+.stats table td .tue,
+.stats table td .wed,
+.stats table td .thu,
+.stats table td .fri {
+  width: 6em;
+}
+.stats table td.marked {
+  background-color: #0088bb;
+}
+.stats .mincolor {
+  color: #3af;
+}
+.stats .maxcolor {
+  color: #f66;
+}
+.stats .minimum {
+  color: #3af;
+  float: left;
+}
+.stats .maximum {
+  color: #f66;
+  float: right;
+}
+.stats .userCredits {
+  text-align: center;
+}
+.stats .credits {
+  font-size: 2.5em;
+}
+.stats .label {
+  font-size: 0.8em;
+}
+.stats .credits,
+.stats .label {
+  text-align: center;
+}
+@media (min-width: 650px), (min-aspect-ratio: 1.5) and (-webkit-min-device-pixel-ratio: 1.25), (min-aspect-ratio: 1.5) and (min-resolution: 120dpi) {
+  .stats .selected {
+    display: none;
+  }
+}
+#conflict {
+  opacity: 0;
+  -webkit-transition: 0.2s opacity linear;
+  transition: 0.2s opacity linear;
+  border-radius: 0 0 4px 4px;
+  position: fixed;
+  top: 0;
+  padding: 8px;
+  margin: auto;
+  background-color: #ddccaa;
+  color: #444;
+}
+pre {
+  padding: 8px;
+  background-color: #333333;
+  font-size: 1.1em;
+  overflow-x: auto;
+}
+code {
+  color: #ddccaa;
+}
+button {
+  background-color: #555555;
+  color: #ddccaa;
+  border: none;
+  padding: 8px 16px;
+  font-size: 1.1em;
+}

@@ -1,0 +1,110 @@
+html {
+    height: 100%;
+    position: relative;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    font-family: "proxima-nova","Helvetica Neue","Helvetica","Roboto","Arial",sans-serif;
+
+    background-color: @reactblack;
+}
+
+#common {
+    border-radius: 0 0 32px 32px;
+    background-color: @reactblack1;
+    color: @reactwhite;
+
+    margin: 0;
+    width: 100%;
+
+    header h1 {
+        margin-top: 0;
+        padding: 16px 0 0 0;
+        color: @reactblue;
+    }
+
+    nav {
+        font-variant: small-caps;
+        margin-top: 3em;
+        padding-bottom: 32px;
+        a {
+            border-left: 4px solid @reactwhite;
+            padding: 4px;
+            margin: 2px;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            &:hover {
+                background-color: @reactblue0;
+            }
+        }
+    }
+
+    & > header, nav a, footer {
+        padding-left: 16px;
+    }
+
+    .desc {
+        font-size: 0.8em;
+    }
+}
+
+main {
+    padding: 16px;
+    color: @reactwhite;
+
+    a {
+        text-decoration: none;
+        color: @reactgrey;
+    }
+}
+
+footer {
+    font-size: .8em;
+
+    &.largeview {
+        display: none;
+        position: absolute;
+        bottom: 0;
+    }
+    &.smallview {
+        display: block;
+        p {margin-bottom: 0;}
+    }
+}
+
+@media (min-width: 650px), (min-aspect-ratio: 1.5) and (min-resolution: 120dpi) {
+    html {
+        height: 100%;
+    }
+    footer {
+        &.largeview {
+            display: block;
+        }
+        &.smallview {
+            display: none;
+        }
+    }
+
+    @sidewidth: 250px;
+    body {
+        min-height: 100%;
+        #common {
+            position: fixed;
+            left: 0;
+            //float: left;
+
+            border-radius: 0 32px 32px 0;
+            height: 100%;
+            width: @sidewidth;
+        }
+
+        main {
+            margin-left: @sidewidth;
+            width: auto;
+            overflow: hidden;
+        }
+    }
+}

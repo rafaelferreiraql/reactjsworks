@@ -1,0 +1,110 @@
+let React = require("react");
+let ReactDOM = require("react-dom");
+let subjectlist = require("./subjects.json");
+
+// REMEMBER! I'm using Webpack! If you're using plain HTML scripts,
+// You oughta use <script src="..."> to call these!
+
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <Stats minCreds={this.props.minCreds} maxCreds={this.props.maxCreds}/>
+        <Subjects subjects={this.props.subjects} />
+      </div>
+    )
+  }
+}
+
+class Stats extends React.Component {
+  render() {
+    return (
+      <div className="stats">
+        <div className="schedule">
+          <table>
+            <thead>
+              <tr>
+                <th className="day"></th>
+                <th>8h</th>
+                <th></th>
+                <th>10h</th>
+                <th></th>
+                <th>12h</th>
+                <th>13h</th>
+                <th></th>
+                <th>15h</th>
+                <th></th>
+                <th>17h</th>
+                <th></th>
+                <th>19h</th>
+              </tr>
+            </thead>
+            <tbody>
+              {["mon","tue","wed","thu","fri"].map((day,i) => {
+                let days = [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday"
+                ];
+                return (
+                  <tr key={i}>
+                    <td className={day}>{days[i]}</td>
+                    {[8,9,10,11,12,13,14,15,16,17,18,19].map((h,i) => {
+                      return <td key={h}></td>
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="credits">
+          <span className="minimum">{this.props.minCreds}</span>
+          <span className="userCredits">0</span>
+          <span className="maximum">{this.props.maxCreds}</span>
+        </div>
+        <div className="label">
+          <span className="minimum">minimum credits</span>
+          <span className="userCredits">credits</span>
+          <span className="maximum">maximum credits</span>
+        </div>
+      </div>
+    )
+  }
+}
+
+class Subjects extends React.Component {
+    render() {
+      <div className="subjects">
+        {this.props.subjects.map((subject,i) => {
+          return (
+            <Subject key={i} subjectdata={subject} />
+          )
+        })}
+      </div>
+    }
+}
+
+class Subject extends React.Component {
+  render() {
+    return (
+    <div className="subj">
+      <p className="subjName">{this.props.subjectdata.name}</p>
+        <p className="subjCreds">Credits: {this.props.subjectdata.credits}</p>
+        <p className="subjSched">
+          { Object.keys(this.props.subjectdata.sched).map((day,index) => {
+            return (
+              <span key={index}>
+                {day} {this.props.subjectdata.sched[day]}
+              </span>
+            )
+          }) }
+        </p>
+    </div>
+    )
+  }
+}
+
+ReactDOM.render(<App subjects={subjectlist} minCreds={16} maxCreds={32} />, document.getElementById("reaction"));

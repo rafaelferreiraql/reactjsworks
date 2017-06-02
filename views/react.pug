@@ -1,0 +1,8 @@
+extends default.pug
+
+block content
+  h2 By "React"  you mean that Youtube channel?
+  p #[a(href="https://facebook.github.io/react/") React] is a web framework for creating rich and interactive user interfaces, having you write JS to build the HTML markup of your app, and at the same time, keeping a reference for that markup inside the Javascript engine, so it can expand your interfaces with interactivity. React is frequently compared to #[a(href="https://angular.io/") Angular], but is different from the latter by not dealing much with the background process. While Angular provides facilities for storing data and functions (in the form of factories, services, values and Dependency Injection), React does nothing about it out of the box.
+  p In short, you build your DOM structure through Javascript (or JSX, more on this below) and renders it into the real DOM, while keeping an equivalent schema stored in your code, complete with data you provide to it. Every time you interact with the real DOM in some way (for example an event) and set your virtual DOM to do something when that interaction is triggered, your script activates that something. Every time the virtual DOM changes, React knows to change only what is relevant in the real DOM (which is slower to act in relation to Javascript).
+  h2 OK, but building DOM through Javascript sounds cumbersome.
+  p And it is, unless you use JSX! JSX is basically Javascript that supports markup, so you can write HTML-style markup inside your Javascript when it's called for. Of course, JSX is NOT Javascript, so there has to be some compilation between your code and execution.

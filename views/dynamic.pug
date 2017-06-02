@@ -1,0 +1,215 @@
+extends default.pug
+
+block content
+  h1 The Process (Interactive interface)
+  p Our app looks fine, but it doesn't #[i work] fine. In fact, it doesn't work at all. Let's make it interactive!
+  h2 React and dynamic applications
+  p Every React component has a #[b State]. Every time that state is changed, the whole app re-renders to reflect these changes (although React knows to change just what needs to change, so the process is faster than it sounds). In our case, we wish to make our plans for this term, so the app must change whenever we add or remove a class from our plans, that's the update condition, so, whenever the list of enrolled classes change, we update. That means our state will consist of this very list. We use the class constructor to define a component's state in React:
+  pre
+    code.
+        class Comp extends React.Component {
+          constructor(props) {
+            super(props);
+            this.state = {
+              // add properties here
+            }
+          }
+        }
+  p That "props" argument is necessary if you're using props in your constructor. We also need #[code super()] because we're extending #[code React.Component], that executes some important things in its own constructor.
+  p In our example, our App would have the following state:
+  pre
+    code.
+      this.state = {
+        selectedSubjects: (() => {
+          let obj = {};
+          this.props.subjects.forEach(function(subject) {
+            obj[subject.name] = false;
+          });
+          return obj;
+        })()
+      }
+
+      /*
+        selectedSubjects will look like this in the end:
+
+        {
+          "Defence Against The Dark Arts": false,
+          "Potions": false,
+          "Charms": false,
+          ...
+        }
+      */
+
+  p Our state has only this one property, #[code selectedSubjects], which lists all subjects as #[code false], until they are eventually added, in which case the added subject will be #[code true].
+  p Of course, it's not enough to know which class I'll enroll in, the app needs to know which credits I currently have and how does my schedule look with the current configuration. Let's add them as properties alongside the state:
+  pre
+    code.
+      constructor(props) {
+        super(props);
+        this.state = {
+          ...
+        };
+        this.credits = 0;
+        this.schedule = { // Just making sure every day is already a property here
+          mon: {},
+          tue: {},
+          wed: {},
+          thu: {},
+          fri: {},
+        };
+      }
+  h2 Managing hierarchy
+  p You may be wondering why not include these properties in the Stats component, since it's the only one that'll use credits and schedule. The reason is that Subjects and Stats can't directly communicate with each other; they both have a common component ancestor, App, that must be the line connecting one to another. Therefore we store this data here and pass to the children via props.
+  pre
+    code
+      :escape-html
+        class App extends React.Component {
+          constructor(props) {
+            ...
+          }
+          render() {
+            return (
+              <div>
+                <Stats
+                  minCreds={this.props.minCreds}
+                  maxCreds={this.props.maxCreds}
+                  schedule={this.schedule}
+                  credits={this.credits}
+                />
+                <Subjects
+                  subjects={this.props.subjects}
+                  selected={this.state.selectedObjects}
+                />
+              </div>
+            )
+          }
+        }
+  p We also pass on data to the Subjects component, as seen above with the one state property being sent to the component, that will store it as a prop. Please note, every time the state changes, the whole app renders, so it's not a problem that Subjects is using this data as a prop, since it is part of the app and will update as well.
+  p Now, let's move on with the Subjects component:
+  pre
+    code
+      :escape-html
+        class Subjects extends React.Component {
+          render() {
+            <div className="subjects">
+              {this.props.subjects.map((subject,i) => {
+                return (
+                  <Subject
+                    key={i}
+                    subjectdata={subject}
+                    active={this.props.selected[subject.name]}
+                  />
+                )
+              })}
+            </div>
+          }
+        }
+  p We're getting ready to start implementing interactivity. #[code active] is a prop stating whether the user selected a subject or not.
+  pre
+    code
+      :escape-html
+        // Tiny library used to help setting a CSS class to the parent div
+        // whenever the 'active' prop is true
+        let classSet = require("classnames");
+
+        class Subject extends React.Component {
+          constructor(props) {
+            super(props);
+            this.toggleSubject = this.toggleSubject.bind(this);
+          }
+
+          toggleSubject() {
+            (!this.props.active ? this.props.add() : this.props.remove)
+          }
+
+          render() {
+            return (
+              <div className={classSet("subj",{active: this.props.active})} onClick={this.toggleSubject}>
+                <p className="subjName">{this.props.subject.name}</p>
+                <p className="subjCreds">Credits: {this.props.subject.credits}</p>
+                <p className="subjSched">
+                  { Object.keys(this.props.subject.sched).map((day) => {
+                    return (
+                      <span key={day}>
+                        {day} {this.props.subject.sched[day]}
+                      </span>
+                    )
+                  }) }
+                </p>
+              </div>
+            )
+          }
+        }
+  p Note the #[code toggleSubject()] function, that is set to onClick in the parent div (quick note: JSX uses camel case, so you're writing onClick and not onclick how you'd do in HTML). Every time this div is clicked, #[code toggleSubject()] is fired. Since the function creates scope, it's common practice to #[code bind()] it to the class in the constructor so you can use the properties defined on the constructor, as well as state and/or props.
+  p You might have noticed the function calls for two props we don't have yet: #[code add()] and #[code remove()]. These two functions must come from the outside, more precisely from the App component, since they both will manage state and properties of that component, and will be passed on as props so each Subject can access them as well.
+  pre
+    code
+      :escape-html
+        class App extends React.Component {
+          ...
+
+          addSubject(subject) {
+            // compareSchedule is a helper function that
+            // checks if there's no conflict between the current
+            // schedule and the subject we're attempting to add
+            if(compareSchedule(subject.sched,this.schedule)) {
+              this.setState(function(prevState) {
+                return {
+                  selectedSubjects: (() => {
+                    prevState.selectedSubjects[subject.name] = true;
+                    return prevState.selectedSubjects;
+                  })(),
+                }
+                  })
+                  this.credits = this.credits + subject.credits;
+                  this.schedule = toggleHour(subject, this.schedule);
+                }
+              }
+
+          removeSubject(subject) {
+            this.setState(function(prevState) {
+              return {
+                selectedSubjects: (() => {
+                  prevState.selectedSubjects[subject.name] = false;
+                  return prevState.selectedSubjects;
+                })(),
+              }
+            });
+            this.credits = this.credits - subject.credits;
+            this.schedule = toggleHour(subject, this.schedule);
+          }
+
+          render() {
+            ...
+            <Subjects
+              subjects={this.props.subjects}
+              add={this.addSubject}
+              remove={this.removeSubject}
+            />
+          }
+        }
+
+        class Subjects extends React.Component {
+          ...
+          render() {
+            <div className="subjects">
+              {this.props.subjects.map((subject,i) => {
+                return (
+                  <Subject
+                    key={i}
+                    subjectdata={subject}
+                    add={this.add.bind(null,subject)}
+                    remove={this.remove.bind(null,subject)}
+                    active={this.state.selectedSubjects[subject.name]}
+                  />
+                )
+              })}
+            </div>
+          }
+        }
+  p #[code this.setState()] is the method you need to use to change state. Since state is used at low level by React, it's important you don't change it manually, even though it's quite tempting sometimes. To help you, you can use the current state you'll change as the argument of the callback function you use inside the method. This callback must return the new state.
+  p By passing the addSubject() and removeSubject() from the App component to each Subject, we can assign them to their click events. If you still doesn't understand all this passing functions as props and whatsoever, I suggest reading the #[a(href="https://facebook.github.io/react/docs/lifting-state-up.html") Lifting State Up] page on the official React docs.
+  h2 Wrapping up
+  p By now you might be able to understand how to proceed with the Stats component. All you have to do is to update the schedule to reflect taken hours and update the credits, making sure the user knows whether the credits are below minimum or exceed the maximum. It takes some work, but it's mostly out of React territory.
+  p Another thing I didn't explain was how to emit that warning when a subject's period clashes with another. Just a tip: I had to add another state property to let the warning text change. Figure it out by yourself, or just read the source code!
+  p And that's it for my introduction to React. There's quite a bit more to React, including lifecycle utilities and event handling, never mind server-side rendering, but with what I showed you there's already a lot you can work with. Also be aware of other libraries like the lightweight alternatives #[a(href="https://preactjs.com/") Preact], #[a(href="https://github.com/Matt-Esch/virtual-dom") virtual-dom] and #[a(href="https://github.com/anthonyshort/deku") Deku], as well as the popular #[a(href="https://vuejs.org/") Vue] and #[a(href="http://riotjs.com/") Riot] libraries that employ similar concepts!

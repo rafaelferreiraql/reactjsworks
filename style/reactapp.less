@@ -1,0 +1,138 @@
+.subjects {
+    width: 100%;
+
+    .subj {
+        width: 15em;
+        display: inline-block;
+        margin: 8px 8px 8px 0;
+        border-radius: 4px;
+        padding: 8px;
+        background-color: @reactwhite;
+        border: 1px solid @reactwhite;
+        color: @reactblack;
+        transition: 0.1s linear;
+
+        font-size: .8em;
+
+        .subjName {
+            margin: 2px 0;
+            font-weight: bold;
+        }
+
+        .subjCreds {
+            font-size: .9em;
+        }
+
+        .subjSched {
+            margin: 8px 0 2px 0;
+            font-size: .8em;
+            * {
+                margin-right: 1em;
+            }
+        }
+
+        &.active {
+            background-color: @reactblack0;
+            border: 1px solid @reactwhite;
+            color: @reactwhite;
+        }
+    }
+}
+
+.stats {
+    display: block;
+    overflow: hidden;
+
+    .selected {
+        float: right;
+    }
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+        border-spacing: 0;
+
+        th {
+            text-align: left;
+
+            // Selecting all but first occurrence,
+            // necessary to keep width consistent
+            & + th {
+                font-size: .7em;
+                font-weight: normal;
+
+                &:not(:empty) {
+                    border-left: 1px solid;
+                }
+            }
+
+            &.day {
+                width: 6em;
+            }
+        }
+
+        td {
+            transition: 0.2s background-color;
+            padding: 8px 0;
+
+            .mon, .tue, .wed, .thu, .fri {
+                width: 6em;
+            }
+
+            &.marked {
+                background-color: @reactblue0;
+            }
+        }
+    }
+
+    .mincolor {
+        color: @mincreds;
+    }
+    .maxcolor {
+        color: @maxcreds;
+    }
+
+    .minimum {
+        color: @mincreds;
+        float: left;
+    }
+    .maximum {
+        color: @maxcreds;
+        float: right;
+    }
+    .userCredits {
+        text-align: center;
+    }
+
+
+    .credits {
+        font-size: 2.5em;
+    }
+    .label {
+        font-size: 0.8em;
+    }
+    .credits, .label {
+        text-align: center;
+    }
+
+}
+
+@media (min-width: 650px), (min-aspect-ratio: 1.5) and (min-resolution: 120dpi) {
+    .stats {
+        .selected {
+            display: none;
+        }
+    }
+}
+
+#conflict {
+    opacity: 0;
+    transition: 0.2s opacity linear;
+    border-radius: 0 0 4px 4px;
+    position: fixed;
+    top: 0;
+    padding: 8px;
+    margin: auto;
+    background-color: @reactwhite0;
+    color: @reactblack;
+}

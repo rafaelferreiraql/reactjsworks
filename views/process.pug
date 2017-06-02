@@ -1,0 +1,264 @@
+extends default.pug
+
+block content
+  h1 The Process
+  p Now that you seen it, let's understand it!
+  h2 Review
+  p Before we start, let's review what exactly is the app; if you haven't seen it yet, follow #[a(href="reaction.html") here]. Now that you've experienced the app, let's summarize.
+  p This application, which we'll call it the "Hogwarts app", has two parts: a info part that shows the user how many credits do the chosen subjects take and the weekly schedule, and the subject list where the user can interact with and add or remove subjects.
+  h2 Reacting to the task
+  p Before all, let's actually add React to the app. There are #[i two] libraries you need: React and ReactDOM. You would normally insert both in #[= "<script src='...'>"] tags in the #[= "<head>"] section, and indeed you could. I'm wrapping all my JS code in Webpack, so instead of adding both React and ReactDOM in tags, my code starts with something like this:
+  pre
+    code.
+      let React = require("react");
+      let ReactDOM = require("react-dom");
+  p So, how exactly would React take care of this?
+  p As said #[a(href="react.html") before], React you write your DOM structure and React renders it to the DOM. There are basically three parts: the schedule, the credits and the subject list. You can neatly divide those three parts in your code. Let's see the very basic structure:
+  pre
+    code
+      :escape-html
+        class App extends React.Component {
+          render() {
+            return (
+              <div>
+                <Stats />
+                <Subjects />
+              </div>
+            )
+          }
+        }
+
+        class Stats extends React.Component {
+          render() {
+            ...
+          }
+        }
+
+        class Subjects extends React.Component {
+          render() {
+            ...
+          }
+        }
+
+        ReactDOM.render(<App />, document.getElementById("reaction"))
+
+  p You might have many questions, and the first is probably "why can you just write markup-style tags in Javascript"? And why it doesn't even look like valid HTML?
+  p This is JSX, not Javascript; this markup is characteristic of JSX, which compiles to Javascript (usually through something like #[a(href="http://babeljs.io/") Babel]), to the React.createElement() function. You can directly write this function instead of having to compile JSX, but it's way uglier boilerplate for something that's supposed to correspond to HTML.
+  p The classes defined here correspond to #[i React Components]. These components are chunks of markup you create in your code, in the form of ES6 classes that extend the React.Component class. You describe these chunks in the #[code render()] method.
+  h2 Organizing the project
+  p In the example above (which is already a crude representation of the Hogwarts app), you render the App component directly in the DOM through react-dom, which, in this case, renders everything inside a div with the "reaction" id. This component also includes a Stats component and a Subjects component, which themselves will be developed in their respective #[code render()]s. If you already checked the source code, you may have noticed the Subjects class doesn't actually exist (there's a Subject class though), but it's a choice of mine I will explain later.
+  p Let's start with the Subjects component.
+  p Every subject is displayed the same way: it's a rounded square containing the name of the subject, the amount of credits and the period of each lesson. Fortunately, in React, you can do something like this:
+  pre
+    code
+      :escape-html
+        render() {
+          <div>
+            {an_array.map(function(item) {
+              return <p>{item}</p>
+            })}
+          </div>
+        }
+  p Every time you use {} inside JSX markup, you're accessing Javascript. So, in this case, for every item in #[code an_array], we return #[code="<p>{item}</p>"], which is a paragraph containing the #[code item] in that iteration (once again, we have to access it through { }). This way, the resulting markup would be:
+  pre
+    code
+      :escape-html
+        render() {
+          <div>
+            {[<p>item1</p>,
+            <p>item2</p>,
+            <p>item3</p>,
+            ...]}
+          </div>
+        }
+
+        ...That React eventually turns to:
+
+        render() {
+          <div>
+            <p>item1</p>
+            <p>item2</p>
+            <p>item3</p>
+            ...
+          </div>
+        }
+  p Wonderful! And that's similar to what we need for our curriculum: a list of items that we can print. In this case, it's a bit more complex; we're not dealing with #[code= "<p>"] tags anymore, it's a whole div with some paragraphs inside containing different data. That calls for the creation of another component, we'll call it Subject.
+  pre
+    code
+      :escape-html
+        render() {
+          <div className="subjects">
+            {subjects.map((subject,i) => {
+              return (
+                <Subject subjectdata={subject} />
+              )
+            })}
+          </div>
+        }
+  h2 Props
+  p Before we go on, there's something we must look at. Inside #[code= "<Subject />"] we have what seems to be an attribute called #[code subjectdata], assigned to the #[code subject] item of the #[code subjects] array. That attribute is called a #[b Prop] in React language, and it's something React components can use inside their definition. In this case, we're going to use the data inside #[code subject] (which would be name, credits and period) to fill the information needed:
+  pre
+    code
+      :escape-html
+        class Subject extends React.Component {
+          render() {
+            return (
+            <div className="subj">
+              <p className="subjName">{this.props.subjectdata.name}</p>
+                <p className="subjCreds">Credits: {this.props.subjectdata.credits}</p>
+                <p className="subjSched">
+                  { Object.keys(this.props.subjectdata.sched).map((day) => {
+                    return (
+                      <span>
+                        {day} {this.props.subjectdata.sched[day]}
+                      </span>
+                    )
+                  }) }
+                </p>
+            </div>
+            )
+          }
+        }
+  p As you might have guessed, #[code this.props.subjectdata] is the #[code subject] passed on to the component in the previous code. We effectively use that data to build our Subject components' markup.
+  p One thing before we continue: When using iterative methods like #[code map()], we must assign a #[code key] prop to each element as well, and each value must be unique between all iterations. That's for internal React use, since it could eventually lose track of which element is which if there's no key to follow. So, let's add a key:
+  pre
+    code
+      :escape-html
+        { Object.keys(this.props.subjectdata.sched).map((day,index) => {
+          return (
+            <span key={index}>
+              {day} {this.props.subjectdata.sched[day]}
+            </span>
+          )
+        }) }
+  p It's simple, but works well enough. It's still unique.
+  p Think about our Hogwarts application again. There are three global fixed datum that won't change once the app is started and we could wish to set or easily change before execution: the curriculum (imagine we want to use that tool for your particular university instead of Hogwarts: you can!), the minimum credits required and maximum credits required.
+  p You may already know where I'm coming from. It'll be convenient to add these as props!
+  pre
+    code
+      :escape-html
+        let subjectlist = require("./subjects.json");
+
+        ReactDOM.render(<App subjects={subjectlist} minCreds={16} maxCreds={32} />, document.getElementById("reaction"))
+
+        // subjects.json
+
+        [
+          {
+            "name": "Defence Against The Dark Arts",
+            "credits": 4,
+            "elective": false,
+            "sched": {
+              "wed": "8-12"
+            }
+          },
+          {
+            "name": "Potions",
+            "credits": 4,
+            "elective": false,
+            "sched": {
+              "mon": "13-15",
+              "thu": "13-15"
+            }
+          },
+          ...
+        ]
+  p Now, every time we want to bring up these values inside the App component, we could just use #[code this.props.yourprop]. However, if we want to use these props on inner components, we have to manually pass them, so for example, coming back to our #[code render()] for the App component,
+  pre
+    code
+      :escape-html
+        render() {
+          return (
+            <div>
+              <Stats minCreds={this.props.minCreds} maxCreds={this.props.maxCreds}/>
+              <Subjects subjects={this.props.subjects}/>
+            </div>
+          )
+        }
+  p (That explains why I don't have the Subjects component in the real code; I'd rather not have to keep passing props through components that won't use it. It's a matter of preference, though)
+  p We should also patch up the Subjects component render, where we can now use the subject list as a prop to generate each #[code= "<Subject />"]. I'll leave that to you.
+  h2 Wrapping up basic markup
+  p Finally, here's the Stats component:
+  pre
+    code
+      :escape-html
+        render() {
+          return (
+            <div className="stats">
+              <div className="schedule">
+                <table>
+                  <thead>
+                    <tr>
+                      <th className="day"></th>
+                      <th>8h</th>
+                      <th></th>
+                      <th>10h</th>
+                      <th></th>
+                      <th>12h</th>
+                      <th>13h</th>
+                      <th></th>
+                      <th>15h</th>
+                      <th></th>
+                      <th>17h</th>
+                      <th></th>
+                      <th>19h</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {["mon","tue","wed","thu","fri"].map((day,i) => {
+                      let days = [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday"
+                      ];
+                      return (
+                        <tr key={i}>
+                          <td className={day}>{days[i]}</td>
+                          {[8,9,10,11,12,13,14,15,16,17,18,19].map((h,i) => {
+                            return <td key={h}></td>
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="credits">
+                <span className="minimum">{this.props.minCreds}</span>
+                <span className="userCredits">0</span>
+                <span className="maximum">{this.props.maxCreds}</span>
+              </div>
+              <div className="label">
+                <span className="minimum">minimum credits</span>
+                <span className="userCredits">credits</span>
+                <span className="maximum">maximum credits</span>
+              </div>
+            </div>
+          )
+        }
+  p Just to quickly summarize: #[code= "<div className='schedule'>"] contains a table describing the weekly schedule. It currently does nothing, it's as good as a framework right now. Likewise, the credits section (represented by the "credits" and "label" divs) do nothing as well, and they currently display 0 credits. We'll make them work soon enough.
+  p Also, don't freak out by the "className" attribute. It's exactly equivalent to #[code= "class='name'"] in HTML, but it's necessary as #[code class] is a reserved keyword in Javascript (and we've been using it for every component definition ;D).
+  p #[a(href="process2.html") Follow here] to continue to the second part, where our app will come alive. Click the button below to show how our code looks like right now (it's hidden just so you won't freak out!)
+  button#sourcebutton Open source code
+  pre#source
+    code
+      include:escape-html process_static-source.txt
+  script.
+    {
+      let source = document.getElementById("source");
+      let sourcebutton = document.getElementById("sourcebutton");
+      source.style.display = "none";
+
+      sourcebutton.onclick = function() {
+        if(source.style.display === "none") {
+          source.style.display = "block";
+          sourcebutton.innerHTML = "WAAAAH! (click again to hide)";
+        }
+        else {
+          source.style.display = "none";
+          sourcebutton.innerHTML = "Open source code";
+        }
+      }
+    }
